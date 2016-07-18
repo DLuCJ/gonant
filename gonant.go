@@ -13,4 +13,9 @@ func main() {
 
 	fmt.Printf("Hello, world!  This be Gonant.\n")
 	gonant.Gonant_Init()
+
+	for ;; {
+		// For ever and ever and ever and e
+	}
+
 }
