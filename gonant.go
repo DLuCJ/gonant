@@ -7,15 +7,14 @@ import (
 )
 
 func main() {
-	fmt.Println(gonant.Column{})
-	fmt.Println(gonant.Song{})
-	fmt.Println(gonant.Instrument{})
-
 	fmt.Printf("Hello, world!  This be Gonant.\n")
-	gonant.Gonant_Init()
+
+	//var song gonant.Song
+	//song = gonant.LoadSongData("data/music.inc")
+	gonant.LoadSongData("data/music.inc")
+	gonant.Init()
 
 	for ;; {
 		// For ever and ever and ever and e
 	}
-
 }

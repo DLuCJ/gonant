@@ -74,7 +74,7 @@ var AUDIO_CLIPAMP int = 32767 // audio clipping amplitude
 
 var wave_buf = make([]int16, WAVE_SIZE * WAVE_CHAN)
 
-func RenderSine() {
+func renderSine() {
 	t := float64(0)
 
 	tone_hz := int16(512)
@@ -101,7 +101,7 @@ func RenderSine() {
 	
 }
 
-func RenderWurstcapturez() {
+func renderWurstcapturez() {
 
 	t := 0
 
@@ -135,7 +135,7 @@ func RenderWurstcapturez() {
 	}
 }
 
-func Gonant_Init() {
+func Init() {
 	fmt.Println("Starting Point of our MZK")
 
 	C.Init_WAVEFORMATEX(C.int(WAVE_CHAN), C.int(WAVE_SPS), C.int(WAVE_ALIGN) * C.int(WAVE_SPS),
@@ -143,8 +143,8 @@ func Gonant_Init() {
 	C.Init_SoundBuf((*C.short)(unsafe.Pointer(&wave_buf[0])))
 	C.Init_WAVEHDR(C.int(WAVE_SIZE * WAVE_CHAN * WAVE_BITS / 8))
 
-//	RenderSine()
-	RenderWurstcapturez()
+//	renderSine()
+	renderWurstcapturez()
 
 	C.Call_waveOutOpen()
 	C.Call_waveOutPrepareHeader()
