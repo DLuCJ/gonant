@@ -1,5 +1,7 @@
 package gonant
 
+var Endpattern int = 0
+
 type Column struct {
 	notes [32]uint8
 }

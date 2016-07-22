@@ -3,49 +3,14 @@ package gonant
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 )
 
-type stringcture struct {
-	sonant_rowlen string
-	song_data_osc1_oct string
-	song_data_osc1_det string
-	song_data_osc1_detune string
-	song_data_osc1_xenv string
-	song_data_osc1_vol string
-	song_data_osc1_waveform string
-
-	song_data_osc2_oct string
-	song_data_osc2_det string
-	song_data_osc2_detune string
-	song_data_osc2_xenv string
-	song_data_osc2_vol string
-	song_data_osc2_waveform string
-
-	song_data_noise_fader string
-
-	song_data_env_attack string
-	song_data_env_sustain string
-	song_data_env_release string
-	song_data_env_master string
-
-	song_data_fx_filter string
-	song_data_fx_freq string
-	song_data_fx_resonance string
-	song_data_fx_delay_time string
-	song_data_fx_delay_amt string
-	song_data_fx_pan_freq string
-	song_data_fx_pan_amt string
-
-	song_data_lfo_osc1_freq string
-	song_data_lfo_fx_freq string
-	song_data_lfo_freq string
-	song_data_lfo_amt string
-	song_data_lfo_waveform string
-
-	song_data_patterns string
-
-	song_data_columns string
-}
+var sdsymbols = [32]string{"auxdata", "osc1_oct", "osc1_det", "osc1_detune", "osc1_xenv", "osc1_vol",
+	"osc1_waveform", "osc2_oct", "osc2_det", "osc2_detune", "osc2_xenv", "osc2_vol", "osc2_waveform",
+	"noise_fader", "env_attack", "env_sustain", "env_release", "env_master", "fx_filter", "fx_freq",
+	"fx_resonance", "fx_delay_time", "fx_delay_amt", "fx_pan_freq", "fx_pan_amt", "lfo_osc1_freq", 
+	"lfo_fx_freq", "lfo_freq", "lfo_amt", "lfo_waveform", "patterns", "columns",}
 
 func fillStructures() {
 	fmt.Println(Column{})
@@ -53,22 +18,30 @@ func fillStructures() {
 	fmt.Println(Instrument{})
 }
 
-func parseSonantOutput(songdata string) stringcture {
-	var strctr stringcture
-	return strctr
+func parseSonantOutput(songdata string) {
+	songmap := make(map[string]string)
+	var symbols []string = strings.Split(songdata, "song_data_")
+	
+	for i := 0; i < 32; i++ {
+		songmap[sdsymbols[i]] = symbols[i]
+	}
+
+	fmt.Println(songmap)
+	fmt.Printf("Endpattern is: %d\n", Endpattern)
 }
 
+//func LoadSongData(filename string) Song{
 func LoadSongData(filename string) {
-	//var songdata stringcture
-	
+	//var song Song
+
 	//TODO: handle errors
 	songbytes,_  := ioutil.ReadFile(filename)
 	songstr := string(songbytes)
 
-	//songdata = parseSonantOutput(songstr)
-
-	fmt.Println(songstr)
-	fillStructures()
+	parseSonantOutput(songstr)
+	
+	//fillStructures()
+	//return song
 }
 
 

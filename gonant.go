@@ -8,13 +8,20 @@ import (
 
 func main() {
 	fmt.Printf("Hello, world!  This be Gonant.\n")
-
 	//var song gonant.Song
 	//song = gonant.LoadSongData("data/music.inc")
-	gonant.LoadSongData("data/music.inc")
-	gonant.Init()
+	
 
-	for ;; {
+
+
+	gonant.LoadSongData("data/music.inc")
+	
+	
+
+
+	//gonant.Init(song)
+
+	//=for ;; {
 		// For ever and ever and ever and e
-	}
+	//}
 }
