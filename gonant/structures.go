@@ -1,6 +1,7 @@
 package gonant
 
-var Endpattern int = 0
+var Endpattern int
+var Rowlen int
 
 type Column struct {
 	notes [32]uint8
@@ -62,6 +63,5 @@ type Instrument struct {
 }
 
 type Song struct {
-	rowlen uint
-	inst [8]Instrument
+	Inst [8]Instrument
 }

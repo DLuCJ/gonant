@@ -2,26 +2,34 @@ package main
 
 import (
 	"fmt"
+	"flag"
 
 	"github.com/DLuCJ/gonant/gonant"
 )
 
 func main() {
-	fmt.Printf("Hello, world!  This be Gonant.\n")
-	//var song gonant.Song
-	//song = gonant.LoadSongData("data/music.inc")
+	var song gonant.Song	
 	
+	var bp = flag.Bool("load", false, "load song data if songdata.go has not been generated using sdgen.py")
+	flag.Parse()
 
+	if *bp {
+		//song = gonant.LoadSongData("data/music.inc")
+		gonant.LoadSongData("data/music.inc")
+	} else {
+		song = gonant.SongData
+		gonant.Rowlen = gonant.SONANT_ROWLEN_
+		gonant.Endpattern = gonant.SONANT_ENDPATTERN_
+	}
 
-
-	gonant.LoadSongData("data/music.inc")
-	
-	
-
+	fmt.Println(song)
+	fmt.Println(gonant.Rowlen)
+	fmt.Println(gonant.Endpattern)
 
 	//gonant.Init(song)
+	gonant.Init()
 
-	//=for ;; {
+	for ;; {
 		// For ever and ever and ever and e
-	//}
+	}
 }

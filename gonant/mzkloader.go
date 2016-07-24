@@ -6,11 +6,40 @@ import (
 	"strings"
 )
 
-var sdsymbols = [32]string{"auxdata", "osc1_oct", "osc1_det", "osc1_detune", "osc1_xenv", "osc1_vol",
-	"osc1_waveform", "osc2_oct", "osc2_det", "osc2_detune", "osc2_xenv", "osc2_vol", "osc2_waveform",
-	"noise_fader", "env_attack", "env_sustain", "env_release", "env_master", "fx_filter", "fx_freq",
-	"fx_resonance", "fx_delay_time", "fx_delay_amt", "fx_pan_freq", "fx_pan_amt", "lfo_osc1_freq", 
-	"lfo_fx_freq", "lfo_freq", "lfo_amt", "lfo_waveform", "patterns", "columns",}
+const (
+	AUXDATA = iota
+	SONG_DATA_OSC1_OCT = iota
+	SONG_DATA_OSC1_DET = iota
+	SONG_DATA_OSC1_DETUNE = iota
+	SONG_DATA_OSC1_XENV = iota
+	SONG_DATA_OSC1_VOL = iota
+	SONG_DATA_OSC1_WAVEFORM = iota
+	SONG_DATA_OSC2_OCT = iota
+	SONG_DATA_OSC2_DET = iota
+	SONG_DATA_OSC2_DETUNE = iota
+	SONG_DATA_OSC2_XENV = iota
+	SONG_DATA_OSC2_VOL = iota
+	SONG_DATA_OSC2_WAVEFORM = iota
+	SONG_DATA_NOISE_FADER = iota
+	SONG_DATA_ENV_ATTACK = iota
+	SONG_DATA_ENV_SUSTAIN = iota
+	SONG_DATA_ENV_RELEASE = iota
+	SONG_DATA_ENV_MASTER = iota
+	SONG_DATA_FX_FILTER = iota
+	SONG_DATA_FX_FREQ = iota
+	SONG_DATA_FX_RESONANCE = iota
+	SONG_DATA_FX_DELAY_TIME = iota
+	SONG_DATA_FX_DELAY_AMT = iota
+	SONG_DATA_FX_PAN_FREQ = iota
+	SONG_DATA_FX_PAN_AMT = iota
+	SONG_DATA_LFO_OSC1_FREQ = iota
+	SONG_DATA_LFO_FX_FREQ = iota
+	SONG_DATA_LFO_FREQ = iota
+	SONG_DATA_LFO_AMT = iota
+	SONG_DATA_LFO_WAVEFORM = iota
+	SONG_DATA_PATTERNS = iota
+	SONG_DATA_COLUMNS = iota
+)
 
 func fillStructures() {
 	fmt.Println(Column{})
@@ -19,11 +48,11 @@ func fillStructures() {
 }
 
 func parseSonantOutput(songdata string) {
-	songmap := make(map[string]string)
+	songmap := make(map[int]string)
 	var symbols []string = strings.Split(songdata, "song_data_")
 	
 	for i := 0; i < 32; i++ {
-		songmap[sdsymbols[i]] = symbols[i]
+		songmap[i] = symbols[i]
 	}
 
 	fmt.Println(songmap)
