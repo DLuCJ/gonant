@@ -120,7 +120,7 @@ func splitSonantOutput(songdata string) (string, map[int][NUM_INSTS]int64, [NUM_
 		j++		
 	}
 
-	return sdarr[0], parm_map, fx_filter_params, sdarr[30], sdarr[31]
+	return sdarr[AUXDATA], parm_map, fx_filter_params, sdarr[SONG_DATA_PATTERNS], sdarr[SONG_DATA_COLUMNS]
 }
 
 //func LoadSongData(filename string) Song{
