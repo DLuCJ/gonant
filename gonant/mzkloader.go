@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	"strconv"
 )
+
+const NUM_INSTS = 8
 
 const (
 	AUXDATA = iota
@@ -41,36 +44,94 @@ const (
 	SONG_DATA_COLUMNS = iota
 )
 
-func fillStructures() {
-	fmt.Println(Column{})
-	fmt.Println(Song{})
-	fmt.Println(Instrument{})
+func fillStructures(auxdata string, parms map[int][NUM_INSTS]int64, fxfreq [NUM_INSTS]float64, patterns string, columns string) { //Song {
+	//var song Song
+	fmt.Println(auxdata)
+	fmt.Println()
+	fmt.Println(parms)
+	fmt.Println()
+	fmt.Println(fxfreq)
+	fmt.Println()
+	fmt.Println(patterns)
+	fmt.Println()
+	fmt.Println(columns)
+
+
+	fmt.Println("*****")
+	fmt.Println(parms[SONG_DATA_OSC2_VOL])
 }
 
-func parseSonantOutput(songdata string) {
-	songmap := make(map[int]string)
+func splitSonantOutput(songdata string) (string, map[int][NUM_INSTS]int64, [NUM_INSTS]float64, string, string){
+	var err error
+
 	var symbols []string = strings.Split(songdata, "song_data_")
-	
-	for i := 0; i < 32; i++ {
-		songmap[i] = symbols[i]
+
+	var sdarr [32]string	
+	for i, elt := range symbols {
+		sdarr[i] = elt
 	}
 
-	fmt.Println(songmap)
-	fmt.Printf("Endpattern is: %d\n", Endpattern)
+	var fx_filter_params [NUM_INSTS]float64
+	parm_map := make(map[int][NUM_INSTS]int64)
+
+	j := 1
+
+	for i := 0; i < 29; i++ {
+		
+		var digarr [NUM_INSTS]int64
+		
+		tokens := strings.Split(sdarr[j], " ")
+		trimmedtok := strings.TrimSpace(tokens[1])
+		digits := strings.Split(trimmedtok, ",")
+
+		if j == SONG_DATA_FX_FREQ {
+			var flotarr [NUM_INSTS]float64
+
+			for idx, elt := range digits {
+				flotarr[idx], err = strconv.ParseFloat(elt, 32)
+			}
+			
+			fx_filter_params = flotarr
+
+		} else if ((j == SONG_DATA_ENV_ATTACK) || (j == SONG_DATA_ENV_SUSTAIN) || (j == SONG_DATA_ENV_RELEASE) ) {
+			
+			for idx, elt := range digits {
+				digarr[idx], err = strconv.ParseInt(elt, 10, 32)
+			}
+				
+		} else {
+			for idx, elt := range digits {
+				digarr[idx], err = strconv.ParseInt(elt, 10, 8)
+			}
+		}
+
+		if err != nil {
+			fmt.Println(err)
+			panic("ERROR: failed to parse music.inc file")
+			
+		}
+
+		if j == SONG_DATA_FX_FREQ {
+			j++
+			continue
+		}
+
+		parm_map[j] = digarr
+		j++		
+	}
+
+	return sdarr[0], parm_map, fx_filter_params, sdarr[30], sdarr[31]
 }
 
 //func LoadSongData(filename string) Song{
 func LoadSongData(filename string) {
-	//var song Song
-
 	//TODO: handle errors
 	songbytes,_  := ioutil.ReadFile(filename)
 	songstr := string(songbytes)
 
-	parseSonantOutput(songstr)
+	auxdata, parms, fxfreq, patterns, columns := splitSonantOutput(songstr)
 	
-	//fillStructures()
-	//return song
+	fillStructures(auxdata, parms, fxfreq, patterns, columns)
 }
 
 

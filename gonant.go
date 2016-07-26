@@ -8,28 +8,42 @@ import (
 )
 
 func main() {
-	var song gonant.Song	
+	fmt.Println("Gonant start")
+	//var song gonant.Song	
 	
 	var bp = flag.Bool("load", false, "load song data if songdata.go has not been generated using sdgen.py")
 	flag.Parse()
 
 	if *bp {
 		//song = gonant.LoadSongData("data/music.inc")
-		gonant.LoadSongData("data/music.inc")
-	} else {
+		gonant.LoadSongData("gonantdata/music.inc")
+	} 
+	
+
+
+	/*
+	else {
 		song = gonant.SongData
 		gonant.Rowlen = gonant.SONANT_ROWLEN_
 		gonant.Endpattern = gonant.SONANT_ENDPATTERN_
 	}
+        */
+	
 
+
+	/*
 	fmt.Println(song)
 	fmt.Println(gonant.Rowlen)
 	fmt.Println(gonant.Endpattern)
+        */
 
 	//gonant.Init(song)
+
+	/*
 	gonant.Init()
 
 	for ;; {
 		// For ever and ever and ever and e
 	}
+        */
 }
