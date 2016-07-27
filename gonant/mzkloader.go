@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"strconv"
+	"unsafe"
 )
 
 const NUM_INSTS = 8
@@ -44,46 +45,60 @@ const (
 	SONG_DATA_COLUMNS = iota
 )
 
-func fillStructures(auxdata string, parms map[int][NUM_INSTS]int64, fxfreq [NUM_INSTS]float64, patterns string, columns string) { //Song {
-	//var song Song
-	fmt.Println(auxdata)
-	fmt.Println()
-	fmt.Println(parms)
-	fmt.Println()
-	fmt.Println(fxfreq)
-	fmt.Println()
-	fmt.Println(patterns)
-	fmt.Println()
-	fmt.Println(columns)
-
-
-	fmt.Println("*****")
-	fmt.Println(parms[SONG_DATA_OSC2_VOL])
+//TODO: dissociate splitSonantOutput interpretation from array idx
+type SDTYPE struct {
+	ptr unsafe.Pointer
+	sdtype int    //AUXDATA..SONG_DATA_COLUMNS
 }
 
-func splitSonantOutput(songdata string) (string, map[int][NUM_INSTS]int64, [NUM_INSTS]float64, string, string){
+func fillStructures(parm_arr [32]unsafe.Pointer) { //Song {
+	//var song Song
+	fmt.Println(*(*string)(parm_arr[AUXDATA]))
+
+	for i:= SONG_DATA_OSC1_OCT; i < SONG_DATA_PATTERNS ; i++ {
+
+		if i == SONG_DATA_FX_FREQ {
+			fmt.Println(*(*[NUM_INSTS]float64)(parm_arr[i]))
+
+		} else {
+			fmt.Println(*(*[NUM_INSTS]int64)(parm_arr[i]))
+		}
+	}
+
+	fmt.Println()
+	fmt.Println(*(*string)(parm_arr[SONG_DATA_PATTERNS]))
+	fmt.Println()
+	fmt.Println(*(*string)(parm_arr[SONG_DATA_COLUMNS]))
+
+	fmt.Println("*****")
+	fmt.Println(*(*[NUM_INSTS]int64)(parm_arr[SONG_DATA_OSC2_VOL]))
+}
+
+func splitSonantOutput(songdata string) ([32]unsafe.Pointer){
+
+	var parm_arr [32]unsafe.Pointer
 	var err error
-
 	var symbols []string = strings.Split(songdata, "song_data_")
-
 	var sdarr [32]string	
+
 	for i, elt := range symbols {
 		sdarr[i] = elt
 	}
 
-	var fx_filter_params [NUM_INSTS]float64
-	parm_map := make(map[int][NUM_INSTS]int64)
+	parm_arr[AUXDATA] = unsafe.Pointer(&sdarr[AUXDATA])
+	parm_arr[SONG_DATA_PATTERNS] = unsafe.Pointer(&sdarr[SONG_DATA_PATTERNS])
+	parm_arr[SONG_DATA_COLUMNS] = unsafe.Pointer(&sdarr[SONG_DATA_COLUMNS])
 
-	j := 1
-
-	for i := 0; i < 29; i++ {
+	for j := SONG_DATA_OSC1_OCT; j < SONG_DATA_PATTERNS; j++ {
 		
 		var digarr [NUM_INSTS]int64
-		
+		var parm_loc unsafe.Pointer
+
 		tokens := strings.Split(sdarr[j], " ")
 		trimmedtok := strings.TrimSpace(tokens[1])
 		digits := strings.Split(trimmedtok, ",")
 
+		
 		if j == SONG_DATA_FX_FREQ {
 			var flotarr [NUM_INSTS]float64
 
@@ -91,18 +106,22 @@ func splitSonantOutput(songdata string) (string, map[int][NUM_INSTS]int64, [NUM_
 				flotarr[idx], err = strconv.ParseFloat(elt, 32)
 			}
 			
-			fx_filter_params = flotarr
+			parm_loc = unsafe.Pointer(&flotarr)
 
 		} else if ((j == SONG_DATA_ENV_ATTACK) || (j == SONG_DATA_ENV_SUSTAIN) || (j == SONG_DATA_ENV_RELEASE) ) {
 			
 			for idx, elt := range digits {
 				digarr[idx], err = strconv.ParseInt(elt, 10, 32)
 			}
+
+			parm_loc = unsafe.Pointer(&digarr)
 				
 		} else {
 			for idx, elt := range digits {
 				digarr[idx], err = strconv.ParseInt(elt, 10, 8)
 			}
+
+			parm_loc = unsafe.Pointer(&digarr)
 		}
 
 		if err != nil {
@@ -111,16 +130,10 @@ func splitSonantOutput(songdata string) (string, map[int][NUM_INSTS]int64, [NUM_
 			
 		}
 
-		if j == SONG_DATA_FX_FREQ {
-			j++
-			continue
-		}
-
-		parm_map[j] = digarr
-		j++		
+		parm_arr[j] = parm_loc
 	}
 
-	return sdarr[AUXDATA], parm_map, fx_filter_params, sdarr[SONG_DATA_PATTERNS], sdarr[SONG_DATA_COLUMNS]
+	return parm_arr
 }
 
 //func LoadSongData(filename string) Song{
@@ -129,9 +142,9 @@ func LoadSongData(filename string) {
 	songbytes,_  := ioutil.ReadFile(filename)
 	songstr := string(songbytes)
 
-	auxdata, parms, fxfreq, patterns, columns := splitSonantOutput(songstr)
+	parm_arr := splitSonantOutput(songstr)
 	
-	fillStructures(auxdata, parms, fxfreq, patterns, columns)
+	fillStructures(parm_arr)
 }
 
 
