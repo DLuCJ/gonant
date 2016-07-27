@@ -46,9 +46,14 @@ const (
 )
 
 //TODO: dissociate splitSonantOutput interpretation from array idx
-type SDTYPE struct {
+type sddata struct {
+	sdt int         //AUXDATA..SONG_DATA_COLUMNS
+	sdsize uint     //num bits representation
+}
+
+type sdtype struct {
 	ptr unsafe.Pointer
-	sdtype int    //AUXDATA..SONG_DATA_COLUMNS
+	sdt sddata    
 }
 
 func fillStructures(parm_arr [32]unsafe.Pointer) { //Song {
