@@ -81,9 +81,13 @@ func fillStructures(parm_arr [32]interface{}) { //Song {
 	fmt.Println(*parm_arr[SONG_DATA_OSC2_VOL].(*[NUM_INSTS]int64))
 }
 
-/* TODO: could use some big time cleaning up.. */
-func splitSonantOutput(songdata string) ([32]interface{}){
+func splitToken(token string) []string {
+	trimmedtok := strings.TrimSpace(token)
+	digits := strings.Split(trimmedtok, ",")
+	return digits[:]
+}
 
+func splitSonantOutput(songdata string) ([32]interface{}) {
 	var parm_arr [32]interface{}
 	var err error
 	var symbols []string = strings.Split(songdata, "song_data_")
@@ -96,62 +100,58 @@ func splitSonantOutput(songdata string) ([32]interface{}){
 	parm_arr[AUXDATA] = &sdarr[AUXDATA]
 
 	for j := SONG_DATA_OSC1_OCT; j <= SONG_DATA_COLUMNS; j++ {
-		
-		var digarr [NUM_INSTS]int64
 		var parm_loc interface{}
-
-		tokens := strings.Split(sdarr[j], " ")
-		trimmedtok := strings.TrimSpace(tokens[1])
-		digits := strings.Split(trimmedtok, ",")
+		var delim string
 		
+		if j == SONG_DATA_PATTERNS || j == SONG_DATA_COLUMNS {
+			delim = "db"
+		} else {
+			delim = " "
+		}
+		
+		tokens := strings.Split(sdarr[j], delim)
+		digits := splitToken(tokens[1])
+	
 		if j == SONG_DATA_PATTERNS {
-			var sdpatarr [NUM_INSTS][48]int64
-			loctokens := strings.Split(sdarr[j], "db")
-			
+			var sdpatarrarr [NUM_INSTS][48]int64
+
 			i := 0
-			for idx, elt := range loctokens {
+			for idx, elt := range tokens {
 				if idx == 0 {
 					continue
 				}
 				
-				var locdigarr [48]int64
-				loctrimmedtok := strings.TrimSpace(elt)
-				digits := strings.Split(loctrimmedtok, ",")
+				digits := splitToken(elt)
 
 				for digidx, digelt := range digits {
-					locdigarr[digidx], err = strconv.ParseInt(digelt, 10, 8)
+					sdpatarrarr[i][digidx], err = strconv.ParseInt(digelt, 10, 8)
 				}
-
-				sdpatarr[i] = locdigarr
+				
 				i++
 			}
 			
-			parm_loc = &sdpatarr
+			parm_loc = &sdpatarrarr
 
 		} else if j == SONG_DATA_COLUMNS {
 
-			var sdcolarr [NUM_INSTS * 10][32]int64
-			loctokens := strings.Split(sdarr[j], "db")
-			
+			var sdcolarrarr [NUM_INSTS * 10][32]int64
+
 			i := 0
-			for idx, elt := range loctokens {
+			for idx, elt := range tokens {
 				if idx == 0 {
 					continue
 				}
 				
-				var locdigarr [32]int64
-				loctrimmedtok := strings.TrimSpace(elt)
-				digits := strings.Split(loctrimmedtok, ",")
-
+				digits := splitToken(elt)
+				
 				for digidx, digelt := range digits {
-					locdigarr[digidx], err = strconv.ParseInt(digelt, 10, 8)
+					sdcolarrarr[i][digidx], err = strconv.ParseInt(digelt, 10, 8)
 				}
 
-				sdcolarr[i] = locdigarr
 				i++
 			}
 			
-			parm_loc = &sdcolarr
+			parm_loc = &sdcolarrarr
 		
 		} else if j == SONG_DATA_FX_FREQ {
 			var flotarr [NUM_INSTS]float64
@@ -162,7 +162,8 @@ func splitSonantOutput(songdata string) ([32]interface{}){
 			
 			parm_loc = &flotarr
 
-		} else if ((j == SONG_DATA_ENV_ATTACK) || (j == SONG_DATA_ENV_SUSTAIN) || (j == SONG_DATA_ENV_RELEASE) ) {
+		} else if (j == SONG_DATA_ENV_ATTACK || j == SONG_DATA_ENV_SUSTAIN || j == SONG_DATA_ENV_RELEASE ) {
+			var digarr [NUM_INSTS]int64
 			
 			for idx, elt := range digits {
 				digarr[idx], err = strconv.ParseInt(elt, 10, 32)
@@ -171,6 +172,8 @@ func splitSonantOutput(songdata string) ([32]interface{}){
 			parm_loc = &digarr
 				
 		} else {
+			var digarr [NUM_INSTS]int64
+			
 			for idx, elt := range digits {
 				digarr[idx], err = strconv.ParseInt(elt, 10, 8)
 			}
