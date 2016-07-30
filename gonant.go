@@ -17,6 +17,9 @@ func main() {
 	if *bp {
 		//song = gonant.LoadSongData("data/music.inc")
 		gonant.LoadSongData("gonantdata/music.inc")
+		fmt.Println(gonant.Rowlen)
+		fmt.Println(gonant.Endpattern)
+		fmt.Println(gonant.Fastforward)
 	} 
 	
 

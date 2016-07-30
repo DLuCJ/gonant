@@ -2,6 +2,7 @@ package gonant
 
 var Endpattern int
 var Rowlen int
+var Fastforward int = -1
 
 type Column struct {
 	notes [32]uint8

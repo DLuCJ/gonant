@@ -58,9 +58,37 @@ type sddata struct {
 	sdt sdtype    
 }
 
+func parseAuxData(dat string) {
+	var err error
+
+	lines := strings.Split(dat, "\n")
+
+	for _, line := range lines {
+		tokens := strings.Split(line, " ")
+		
+		if tokens[0] != "%define" {
+			continue
+		}
+
+		if tokens[1] == "_4K_SONANT_ROWLEN_" {
+			Rowlen, err = strconv.Atoi(tokens[2])
+		} else if tokens[1] == "_4K_SONANT_ENDPATTERN_" {
+			Endpattern, err = strconv.Atoi(tokens[2])
+		} else if tokens[1] == "_4K_SONANT_FASTFORWARD_" {
+			Fastforward = 0
+		}	
+	}
+
+	if err != nil {
+		fmt.Println(err)
+		panic("ERROR: failed to parse music.inc file")
+		
+	}	
+} 
+
 func fillStructures(parm_arr [32]interface{}) { //Song {
 	//var song Song
-	fmt.Println(*parm_arr[AUXDATA].(*string))
+	parseAuxData(*parm_arr[AUXDATA].(*string))
 
 	for i:= SONG_DATA_OSC1_OCT; i <= SONG_DATA_COLUMNS ; i++ {
 
