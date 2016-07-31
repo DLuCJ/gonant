@@ -86,27 +86,61 @@ func parseAuxData(dat string) {
 	}	
 } 
 
-func fillStructures(parm_arr [32]interface{}) { //Song {
-	//var song Song
+func fillStructures(parm_arr [32]interface{}) Song{ 
+	var song Song
 	parseAuxData(*parm_arr[AUXDATA].(*string))
 
-	for i:= SONG_DATA_OSC1_OCT; i <= SONG_DATA_COLUMNS ; i++ {
+	for i := 0; i < 8; i++ {
+		song.Inst[i].osc1_oct       = uint8((*parm_arr[SONG_DATA_OSC1_OCT].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc1_det       = uint8((*parm_arr[SONG_DATA_OSC1_DET].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc1_detune    = uint8((*parm_arr[SONG_DATA_OSC1_DETUNE].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc1_xenv 	    = uint8((*parm_arr[SONG_DATA_OSC1_XENV].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc1_vol 	    = uint8((*parm_arr[SONG_DATA_OSC1_VOL].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc1_waveform  = uint8((*parm_arr[SONG_DATA_OSC1_WAVEFORM].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_oct       = uint8((*parm_arr[SONG_DATA_OSC2_OCT].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_det       = uint8((*parm_arr[SONG_DATA_OSC2_DET].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_detune    = uint8((*parm_arr[SONG_DATA_OSC2_DETUNE].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_xenv      = uint8((*parm_arr[SONG_DATA_OSC2_XENV].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_vol       = uint8((*parm_arr[SONG_DATA_OSC2_VOL].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].osc2_waveform  = uint8((*parm_arr[SONG_DATA_OSC2_WAVEFORM].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].noise_fader    = uint8((*parm_arr[SONG_DATA_NOISE_FADER].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].env_attack     = uint((*parm_arr[SONG_DATA_ENV_ATTACK].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].env_sustain    = uint((*parm_arr[SONG_DATA_ENV_SUSTAIN].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].env_release    = uint((*parm_arr[SONG_DATA_ENV_RELEASE].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].env_master     = uint8((*parm_arr[SONG_DATA_ENV_MASTER].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_filter      = uint8((*parm_arr[SONG_DATA_FX_FILTER].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_freq        = float32((*parm_arr[SONG_DATA_FX_FREQ].(*[NUM_INSTS]float64))[i])
+		song.Inst[i].fx_resonance   = uint8((*parm_arr[SONG_DATA_FX_RESONANCE].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_delay_time  = uint8((*parm_arr[SONG_DATA_FX_DELAY_TIME].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_delay_amt   = uint8((*parm_arr[SONG_DATA_FX_DELAY_AMT].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_pan_freq    = uint8((*parm_arr[SONG_DATA_FX_PAN_FREQ].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].fx_pan_amt     = uint8((*parm_arr[SONG_DATA_FX_PAN_AMT].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].lfo_osc1_freq  = uint8((*parm_arr[SONG_DATA_LFO_OSC1_FREQ].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].lfo_fx_freq    = uint8((*parm_arr[SONG_DATA_LFO_FX_FREQ].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].lfo_freq       = uint8((*parm_arr[SONG_DATA_LFO_FREQ].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].lfo_amt        = uint8((*parm_arr[SONG_DATA_LFO_AMT].(*[NUM_INSTS]int64))[i])
+		song.Inst[i].lfo_waveform   = uint8((*parm_arr[SONG_DATA_LFO_WAVEFORM].(*[NUM_INSTS]int64))[i])
 
-		if i == SONG_DATA_FX_FREQ {
-			fmt.Println(*parm_arr[i].(*[NUM_INSTS]float64))
-		} else if i == SONG_DATA_PATTERNS {
-			fmt.Println(*parm_arr[i].(*[NUM_INSTS][48]int64))
-		} else if i == SONG_DATA_COLUMNS {
-			fmt.Println(*parm_arr[i].(*[NUM_INSTS * 10][32]int64))
-		} else {
-			fmt.Println(*parm_arr[i].(*[NUM_INSTS]int64))
+		var patarr [48]int8 
+		
+		for j, elt := range (*parm_arr[SONG_DATA_PATTERNS].(*[NUM_INSTS][48]int64))[i] {
+			patarr[j] = int8(elt)
+		}
+		
+		song.Inst[i].pats = patarr
+		
+		for j := 0; j < 10; j++ {
+
+			var notearr [32]uint8
+			for k, elt := range (*parm_arr[SONG_DATA_COLUMNS].(*[NUM_INSTS * 10][32]int64))[i * 10 + j] {
+				notearr[k] = uint8(elt)
+			}
+			
+			song.Inst[i].cols[j].notes = notearr
 		}
 	}
 
-	fmt.Println()
-
-	fmt.Println("*****")
-	fmt.Println(*parm_arr[SONG_DATA_OSC2_VOL].(*[NUM_INSTS]int64))
+	return song
 }
 
 func splitToken(token string) []string {
@@ -115,7 +149,7 @@ func splitToken(token string) []string {
 	return digits[:]
 }
 
-func splitSonantOutput(songdata string) ([32]interface{}) {
+func splitSonantOutput(songdata string) [32]interface{} {
 	var parm_arr [32]interface{}
 	var err error
 	var symbols []string = strings.Split(songdata, "song_data_")
@@ -221,15 +255,14 @@ func splitSonantOutput(songdata string) ([32]interface{}) {
 	return parm_arr
 }
 
-//func LoadSongData(filename string) Song{
-func LoadSongData(filename string) {
+func LoadSongData(filename string) Song{
 	//TODO: handle errors
 	songbytes,_  := ioutil.ReadFile(filename)
 	songstr := string(songbytes)
 
-	parm_arr := splitSonantOutput(songstr)
-	
-	fillStructures(parm_arr)
+	parm_arr := splitSonantOutput(songstr)	
+	song := fillStructures(parm_arr)
+	return song
 }
 
 
