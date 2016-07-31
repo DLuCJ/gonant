@@ -135,8 +135,10 @@ func renderWurstcapturez() {
 	}
 }
 
-func Init() {
-	fmt.Println("Starting Point of our MZK")
+func Init(song Song) {
+	fmt.Println(song)
+	fmt.Println(Rowlen)
+	fmt.Println(Endpattern)
 
 	C.Init_WAVEFORMATEX(C.int(WAVE_CHAN), C.int(WAVE_SPS), C.int(WAVE_ALIGN) * C.int(WAVE_SPS),
 		C.int(WAVE_ALIGN), C.int(WAVE_BITS))

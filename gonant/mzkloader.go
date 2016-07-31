@@ -90,7 +90,7 @@ func fillStructures(parm_arr [32]interface{}) Song{
 	var song Song
 	parseAuxData(*parm_arr[AUXDATA].(*string))
 
-	for i := 0; i < 8; i++ {
+	for i := 0; i < NUM_INSTS; i++ {
 		song.Inst[i].osc1_oct       = uint8((*parm_arr[SONG_DATA_OSC1_OCT].(*[NUM_INSTS]int64))[i])
 		song.Inst[i].osc1_det       = uint8((*parm_arr[SONG_DATA_OSC1_DET].(*[NUM_INSTS]int64))[i])
 		song.Inst[i].osc1_detune    = uint8((*parm_arr[SONG_DATA_OSC1_DETUNE].(*[NUM_INSTS]int64))[i])

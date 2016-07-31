@@ -22,13 +22,7 @@ func main() {
 		gonant.Endpattern = gonant.SONANT_ENDPATTERN_
 	}
         	
-	fmt.Println(song)
-	fmt.Println(gonant.Rowlen)
-	fmt.Println(gonant.Endpattern)
-
-	//gonant.Init(song)
-
-	gonant.Init()
+	gonant.Init(song)
 
 	for ;; {
 		// For ever and ever and ever and e
