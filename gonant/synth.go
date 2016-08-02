@@ -74,31 +74,13 @@ var AUDIO_CLIPAMP int = 32767 // audio clipping amplitude
 
 var wave_buf = make([]int16, WAVE_SIZE * WAVE_CHAN)
 
-func renderSine() {
-	t := float64(0)
+func oscSine(value float64) float64{
+	return math.Sin(2.0 * 3.141592653589793 * value)
+}
 
-	tone_hz := int16(512)
-	tone_vol := int16(3000)
-	cur_sample := 0
-
-	waveperiod := WAVE_SPS / int(tone_hz)
-
-	for sample_index := 0; sample_index < WAVE_SIZE ; sample_index++ {
-
-		sineValue := math.Sin(t)
-		
-		sample_val := int16(sineValue * float64(tone_vol))
-		wave_buf[cur_sample] = sample_val
-		wave_buf[cur_sample + 1] = sample_val
-
-		t += float64(2.0 * 3.141592653589793 * (1.0 / float64(waveperiod)))
-		if t > (2.0 * 3.141592653589793) {
-			t -= 2.0 * 3.141592653589793
-		}
-
-		cur_sample += 2
-	}
-	
+func oscSquare(value float64) float64{
+	if oscSine(value) < 0 {	return -1.0 } 
+	return 1.0
 }
 
 func renderWurstcapturez() {
@@ -145,7 +127,6 @@ func Init(song Song) {
 	C.Init_SoundBuf((*C.short)(unsafe.Pointer(&wave_buf[0])))
 	C.Init_WAVEHDR(C.int(WAVE_SIZE * WAVE_CHAN * WAVE_BITS / 8))
 
-//	renderSine()
 	renderWurstcapturez()
 
 	C.Call_waveOutOpen()
