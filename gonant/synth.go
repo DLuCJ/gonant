@@ -62,7 +62,7 @@ import "C"
 import (
 	"math"
 	"fmt"
-	"unsafe"
+	"unsafe"  //TODO: maybe can use for access into oscillators?
 )
 
 var WAVE_CHAN int = 2 //channels
@@ -73,14 +73,59 @@ var WAVE_SIZE int = WAVE_CHAN * WAVE_SPS * 240 // buffer size in samples
 var AUDIO_CLIPAMP int = 32767 // audio clipping amplitude
 
 var wave_buf = make([]int16, WAVE_SIZE * WAVE_CHAN)
+var lbuf, rbuf = make([]float64, WAVE_SIZE), make([]float64, WAVE_SIZE)
 
-func oscSine(value float64) float64{
-	return math.Sin(2.0 * 3.141592653589793 * value)
+func renderOsc(osc oscfn) {
+	//render snd given osc param - experiment
+	
+	t := float64(0)
+
+	tone_hz := int16(512)
+	tone_vol := int16(3000)
+	cur_sample := 0
+
+	waveperiod := WAVE_SPS / int(tone_hz)
+
+	for sample_index := 0; sample_index < WAVE_SIZE ; sample_index++ {
+
+		sineValue := oscSine(t)
+		
+		sample_val := int16(sineValue * float64(tone_vol))
+		wave_buf[cur_sample] = sample_val
+		wave_buf[cur_sample + 1] = sample_val
+
+		t += 1.0 / float64(waveperiod)
+
+		cur_sample += 2
+	}
+	
 }
 
-func oscSquare(value float64) float64{
-	if oscSine(value) < 0 {	return -1.0 } 
-	return 1.0
+func renderSine() {
+	t := float64(0)
+
+	tone_hz := int16(512)
+	tone_vol := int16(3000)
+	cur_sample := 0
+
+	waveperiod := WAVE_SPS / int(tone_hz)
+
+	for sample_index := 0; sample_index < WAVE_SIZE ; sample_index++ {
+
+		sineValue := math.Sin(t)
+		
+		sample_val := int16(sineValue * float64(tone_vol))
+		wave_buf[cur_sample] = sample_val
+		wave_buf[cur_sample + 1] = sample_val
+
+		t += float64(2.0 * 3.141592653589793 * (1.0 / float64(waveperiod)))
+		if t > (2.0 * 3.141592653589793) {
+			t -= 2.0 * 3.141592653589793
+		}
+
+		cur_sample += 2
+	}
+	
 }
 
 func renderWurstcapturez() {
@@ -127,8 +172,15 @@ func Init(song Song) {
 	C.Init_SoundBuf((*C.short)(unsafe.Pointer(&wave_buf[0])))
 	C.Init_WAVEHDR(C.int(WAVE_SIZE * WAVE_CHAN * WAVE_BITS / 8))
 
-	renderWurstcapturez()
+	oscs := oscillators{oscSine, oscSquare, oscSaw, oscTri}
+	
+	renderOsc(oscs.sine)
+	//renderSine()
+	//renderWurstcapturez()
 
+	fmt.Println(len(lbuf))
+	fmt.Println(len(rbuf))
+	
 	C.Call_waveOutOpen()
 	C.Call_waveOutPrepareHeader()
 	C.Call_waveOutWrite()
