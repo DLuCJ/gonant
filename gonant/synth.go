@@ -75,6 +75,25 @@ var AUDIO_CLIPAMP int = 32767 // audio clipping amplitude
 var wave_buf = make([]int16, WAVE_SIZE * WAVE_CHAN)
 var lbuf, rbuf = make([]float64, WAVE_SIZE), make([]float64, WAVE_SIZE)
 
+func getFreq(fFreq float64, fMultiplier float64, note uint8, note_limit uint8) float64 {
+	if note > note_limit {
+		note -= note_limit
+	} else {
+		note = note_limit - note
+		fMultiplier = 1.0 / fMultiplier
+	}
+
+	for ; note > 0; note-- {
+		fFreq *= fMultiplier
+	}
+
+	return fFreq
+}
+
+func getNoteFreq(note uint8) float64{
+	return getFreq(0.00390625, 1.059463094, note, 128)
+}
+
 func renderOsc(nwaveform uint8) {
 	//render snd given osc param - experiment
 	
@@ -88,9 +107,9 @@ func renderOsc(nwaveform uint8) {
 
 	for sample_index := 0; sample_index < WAVE_SIZE ; sample_index++ {
 
-		sineValue := getOscOutput(nwaveform, t)
+		oscValue := getOscOutput(nwaveform, t)
 		
-		sample_val := int16(sineValue * float64(tone_vol))
+		sample_val := int16(oscValue * float64(tone_vol))
 		wave_buf[cur_sample] = sample_val
 		wave_buf[cur_sample + 1] = sample_val
 
@@ -147,7 +166,6 @@ func Init(song Song) {
 
 	renderOsc(0)
 
-	//renderSine()
 	//renderWurstcapturez()
 
 	fmt.Println(len(lbuf))
