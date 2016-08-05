@@ -1,24 +1,25 @@
 package gonant
 
+//note: https://en.wikibooks.org/wiki/Sound_Synthesis_Theory/Oscillators_and_Wavetables
+
 import (
 	"math"
 )
 
 type oscfn func(float64) float64
 
-type oscillators struct {
-	sine oscfn
-	sqr  oscfn
-	saw  oscfn
-	tri  oscfn
+var oscarr = []oscfn{oscSin, oscSquare, oscSaw, oscTri}
+
+func getOscOutput(nwaveform uint8, fvalue float64) float64 {
+	return oscarr[nwaveform](fvalue)
 }
 
-func oscSine(value float64) float64 {
+func oscSin(value float64) float64 {
 	return math.Sin(2.0 * 3.141592653589793 * value)
 }
 
 func oscSquare(value float64) float64 {
-	if oscSine(value) < 0 {	return -1.0 } 
+	if oscSin(value) < 0 {	return -1.0 } 
 	return 1.0
 }
 
